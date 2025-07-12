@@ -6,11 +6,12 @@ on:
       service_name:
         description: 'Service name to deploy'
         required: true
-        default: 'my-service'   # You can set a default or leave empty
+        default: 'my-service'   # change or leave empty
 
-  push:
-    branches:
-      - develop
+# Remove push trigger to prevent auto deploy on push
+# push:
+#   branches:
+#     - develop
 
 jobs:
   deploy:
