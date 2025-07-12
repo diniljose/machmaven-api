@@ -13,6 +13,9 @@ jobs:
     environment:
       name: deploy
 
+    env:
+      SERVICE_NAME: dev.starter-template  # Set this to your service name or pass via secrets/env
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -42,13 +45,13 @@ jobs:
 
       - name: Deploy on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} <<'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} <<EOF
             set -e
-            cd /home/dinil-dev/system-storage/apps/${{ env.SERVICE_NAME }}
-            sudo systemctl stop ${SERVICE_NAME} || true
+            cd /home/dinil-dev/system-storage/apps/$SERVICE_NAME
+            sudo systemctl stop $SERVICE_NAME || true
             rm -rf *
-            tar -xvzf /home/ubuntu/app.tar.gz -C /home/dinil-dev/system-storage/apps/${{ env.SERVICE_NAME }}
+            tar -xvzf /home/ubuntu/app.tar.gz -C /home/dinil-dev/system-storage/apps/$SERVICE_NAME
             npm ci --omit=dev
-            sudo systemctl start ${SERVICE_NAME}
+            sudo systemctl start $SERVICE_NAME
             echo "Deployment complete!"
           EOF
