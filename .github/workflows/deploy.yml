@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: deploy
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,23 +44,11 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} <<'EOF'
             set -e
-
-            cd /home/dinil-dev/system-storage/apps/dev.ummumeen-api
-
-            echo "Stopping systemd service dev.ummumeen-api..."
-            sudo systemctl stop dev.ummumeen-api || true
-
-            echo "Cleaning old app files..."
+            cd /home/dinil-dev/system-storage/apps/${{ env.SERVICE_NAME }}
+            sudo systemctl stop ${SERVICE_NAME} || true
             rm -rf *
-
-            echo "Extracting new build..."
-            tar -xvzf /home/ubuntu/app.tar.gz -C /home/dinil-dev/system-storage/apps/dev.ummumeen-api
-
-            echo "Installing dependencies..."
+            tar -xvzf /home/ubuntu/app.tar.gz -C /home/dinil-dev/system-storage/apps/${{ env.SERVICE_NAME }}
             npm ci --omit=dev
-
-            echo "Starting systemd service dev.ummumeen-api..."
-            sudo systemctl start dev.ummumeen-api
-
+            sudo systemctl start ${SERVICE_NAME}
             echo "Deployment complete!"
           EOF
