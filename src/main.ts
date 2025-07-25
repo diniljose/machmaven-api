@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { globalSetupValidations, setUpCookies, setupCors, setupHelmets } from './common/secuirities/secuirity';
 import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
+import { HOST, PORT } from './constants';
+import { Logger } from '@nestjs/common';
+import { AppInfo } from './helpers/app-info';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -17,7 +20,9 @@ async function bootstrap() {
   await setUpCookies(app);
   try {
     await Promise.all([setupCors(app), setupHelmets(app)]);
-    await app.listen(process.env.PORT, '');
+    await app.listen(PORT, HOST, () => {
+      Logger.debug(`Server ${AppInfo.fullName} listening at http://${HOST}:${PORT}/`, AppInfo.name);
+    });
   } catch (error) {
     console.error('Error during bootstrap:', error);
   }

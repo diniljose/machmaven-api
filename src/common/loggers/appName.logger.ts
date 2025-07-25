@@ -1,6 +1,6 @@
 // src/loggers/app-name.logger.ts
 import { ConsoleLogger } from '@nestjs/common';
-import { AppInfo } from 'src/helpers/env.config';
+import { AppInfo } from 'src/helpers/app-info';
 
 
 export class AppNameLogger extends ConsoleLogger {
