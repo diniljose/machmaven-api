@@ -2,32 +2,22 @@ name: Deploy NestJS app to EC2
 
 on:
   workflow_dispatch:
-    inputs:
-      service_name:
-        description: 'Service name to deploy'
-        required: true
-        default: 'my-service'   # change or leave empty
-
-# Remove push trigger to prevent auto deploy on push
-# push:
-#   branches:
-#     - develop
+  push:
+    branches: [ develop ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    environment:
-      name: deploy
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies and build
         run: |
@@ -35,9 +25,9 @@ jobs:
           npm run build
 
       - name: Setup SSH key
-        uses: webfactory/ssh-agent@v0.8.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY}}
 
       - name: Package build folder
         run: |
@@ -48,16 +38,29 @@ jobs:
           scp -o StrictHostKeyChecking=no app.tar.gz ubuntu@${{ secrets.SERVER_HOST }}:/home/ubuntu/
 
       - name: Deploy on EC2
-        env:
-          SERVICE_NAME: ${{ github.event.inputs.service_name }}
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} <<EOF
-            set -e
-            cd /home/dinil-dev/system-storage/apps/$SERVICE_NAME
-            sudo systemctl stop $SERVICE_NAME || true
-            rm -rf *
-            tar -xvzf /home/ubuntu/app.tar.gz -C /home/dinil-dev/system-storage/apps/$SERVICE_NAME
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} <<'EOF'
+            set -euo pipefail
+
+            APP_DIR="/home/dinil-dev/system-storage/apps/machemaven-api"
+            TAR="/home/ubuntu/app.tar.gz"
+            SERVICE="machemaven-api"
+
+            echo "[1/5] Stop service if running"
+            sudo systemctl stop "$SERVICE" || true
+
+            echo "[2/5] Prepare dir and clean old files"
+            mkdir -p "$APP_DIR"
+            find "$APP_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+
+            echo "[3/5] Extract new build"
+            tar -xzf "$TAR" -C "$APP_DIR"
+
+            echo "[4/5] Install production deps"
+            cd "$APP_DIR"
             npm ci --omit=dev
-            sudo systemctl start $SERVICE_NAME
-            echo "Deployment complete for $SERVICE_NAME!"
+
+            echo "[5/5] Start service"
+            sudo systemctl start "$SERVICE"
+            sudo systemctl status "$SERVICE" --no-pager || true
           EOF

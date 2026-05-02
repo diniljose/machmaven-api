@@ -7,6 +7,12 @@ export const DEBUG_LEVEL = (process.env.SERVER_LOG_LEVEL || 'debug') as LogLevel
 export const APP_DOCUMENTATION = process.env.APP_DOCUMENTATION || '';
 export const POSTGRES_DB_URI = process.env.DB_URI || '';
 
+
+export const GMAIL_USER = process.env.GMAIL_USER || 'dsdf';
+export const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'dfdf';
+export const MAIL_TO = process.env.MAIL_TO || '';
+export const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || '';
+
 export const debugLevel: LogLevel[] = (() => {
   switch (DEBUG_LEVEL) {
     case 'debug': return ['debug', 'warn', 'error'];
