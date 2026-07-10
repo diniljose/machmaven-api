@@ -13,6 +13,9 @@ const whitelist = new Set([
   'http://localhost:4200',
   'https://localhost:4200',
   'http://localhost:8100',
+  'http://localhost:3000',
+  'https://machmaven.com',
+  'https://machmaven.com',
 ]);
 const allowedHeaders = [
   'Access-Control-Allow-Origin',
