@@ -8,9 +8,9 @@ export const APP_DOCUMENTATION = process.env.APP_DOCUMENTATION || '';
 export const POSTGRES_DB_URI = process.env.DB_URI || '';
 
 
-export const GMAIL_USER = process.env.GMAIL_USER || 'josedinil.jd@gmail.com';
-export const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'sfdsdf';
-export const MAIL_TO = process.env.MAIL_TO || 'sdd';
+export const GMAIL_USER = process.env.GMAIL_USER || 'kwtsdevelopers@gmail.com';
+export const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || '';
+export const MAIL_TO = process.env.MAIL_TO || 'josedinil.jd@gmail.com';
 export const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || 'MachMaven Website';
 
 export const debugLevel: LogLevel[] = (() => {

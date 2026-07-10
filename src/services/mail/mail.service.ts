@@ -34,7 +34,7 @@ export class MailService {
   }
 
 
-  private async processAttachment(file: any) {
+private async processAttachment(file: any) {
   if (!file) return null;
 
   if (!ALLOWED_TYPES.includes(file.mimetype)) {
@@ -43,24 +43,21 @@ export class MailService {
     );
   }
 
-  const chunks: Buffer[] = [];
-  let total = 0;
+  if (!file.buffer) {
+    throw new BadRequestException(
+      'Invalid attachment data.',
+    );
+  }
 
-  for await (const chunk of file.file) {
-    total += chunk.length;
-
-    if (total > MAX_FILE_SIZE) {
-      throw new BadRequestException(
-        'Maximum allowed file size is 10MB.',
-      );
-    }
-
-    chunks.push(chunk);
+  if (file.buffer.length > MAX_FILE_SIZE) {
+    throw new BadRequestException(
+      'Maximum allowed file size is 10MB.',
+    );
   }
 
   return {
     filename: file.filename,
-    content: Buffer.concat(chunks),
+    content: file.buffer,
     contentType: file.mimetype,
   };
 }
@@ -75,33 +72,35 @@ export class MailService {
 
   const attachment = await this.processAttachment(file);
 
-  const subject = `[${dto.type.toUpperCase()}] Message from ${dto.name}`;
+ const subject = dto?.type || 'SUPPORT';
 
-  const html = `
-      <h2>New ${dto.type}</h2>
+const html = `
 
-      <table cellpadding="6" cellspacing="0" border="1">
-        <tr><td><b>Name</b></td><td>${dto.name}</td></tr>
-        <tr><td><b>Email</b></td><td>${dto.email}</td></tr>
-        <tr><td><b>Phone</b></td><td>${dto.phone ?? '-'}</td></tr>
-        <tr><td><b>Material / Quantity</b></td><td>${dto.material ?? '-'}</td></tr>
-        <tr><td><b>Delivery Target</b></td><td>${dto.deliveryTarget ?? '-'}</td></tr>
-        <tr><td><b>Attachment</b></td><td>${attachment ? attachment.filename : 'None'}</td></tr>
-        <tr><td><b>Client IP</b></td><td>${clientIp ?? '-'}</td></tr>
-      </table>
 
-      <br/>
+  <table cellpadding="6" cellspacing="0" border="1">
+    <tr><td><b>Name</b></td><td>${dto?.name}</td></tr>
+    <tr><td><b>Email</b></td><td>${dto?.email}</td></tr>
+    <tr><td><b>Phone</b></td><td>${dto?.phone ?? '-'}</td></tr>
+    <tr><td><b>Material / Quantity</b></td><td>${dto?.material ?? '-'}</td></tr>
+    <tr><td><b>Delivery Target</b></td><td>${dto?.deliveryTarget ?? '-'}</td></tr>
+    <tr><td><b>Attachment</b></td><td>${attachment ? attachment?.filename : 'None'}</td></tr>
+    <tr><td><b>Client IP</b></td><td>${clientIp ?? '-'}</td></tr>
+  </table>
 
-      <h3>Message</h3>
+  <br/>
 
-      <div style="
-        border:1px solid #ddd;
-        padding:15px;
-        white-space:pre-wrap;
-      ">
-      ${dto.message}
-      </div>
-  `;
+  <h3>Message</h3>
+
+  <div style="
+    border:1px solid #ddd;
+    padding:15px;
+    white-space:pre-wrap;
+  ">
+  ${dto.message}
+  </div>
+`;
+  console.log(html);
+  
 
   try {
     const result = await this.transporter.sendMail({
