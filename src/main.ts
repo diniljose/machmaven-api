@@ -14,6 +14,7 @@ async function bootstrap() {
     }),
   );
 
+
   //await trackSecurity(app); //very trackcode in middleware
   await globalSetupValidations(app);
   //await setupSwagger(app);

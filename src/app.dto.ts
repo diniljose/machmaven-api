@@ -14,6 +14,15 @@ export class SendMailDto {
   @MaxLength(20)
   phone?: string;
 
+    @IsString()
+  @IsOptional()
+  material: string; 
+
+
+      @IsString()
+  @IsOptional()
+  deliveryTarget:string
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(30)

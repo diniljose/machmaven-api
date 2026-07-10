@@ -3,7 +3,8 @@ import { NestFastifyApplication } from "@nestjs/platform-fastify";
 import fastifyCors from '@fastify/cors';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyCookie from '@fastify/cookie';
-import fastifyMultipart from '@fastify/multipart';
+import multipart from '@fastify/multipart';
+
 import { AppNameLogger } from "../loggers/appName.logger";
 
 
@@ -82,13 +83,13 @@ export async function globalSetupValidations(app: NestFastifyApplication) {
       transform: true,
     }),
   );
-  app.register(fastifyMultipart, {
-    addToBody: true,
+  await app.register(multipart, {
     limits: {
-      fileSize: 10 * 1024 * 1024, // Set max file size to 10 MB
-      files: 10, // Allow up to 10 files
+      fileSize: 10 * 1024 * 1024, //10MB
+      files: 1,
     },
   });
+
   //app.useGlobalInterceptors(new CustomErrorHandler());
 }
 
