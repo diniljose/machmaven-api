@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { globalSetupValidations, setUpCookies, setupCors, setupHelmets } from './common/secuirities/secuirity';
+import { globalSetupValidations, setUpCookies, setupHelmets } from './common/secuirities/secuirity';
 import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
 import { HOST, PORT } from './constants';
 import { Logger } from '@nestjs/common';
@@ -20,7 +20,7 @@ async function bootstrap() {
   //await setupSwagger(app);
   await setUpCookies(app);
   try {
-    await Promise.all([setupCors(app), setupHelmets(app)]);
+    await Promise.all([ setupHelmets(app)]);
     await app.listen(PORT, HOST, () => {
       Logger.debug(`Server ${AppInfo.fullName} listening at http://${HOST}:${PORT}/`, AppInfo.name);
     });
