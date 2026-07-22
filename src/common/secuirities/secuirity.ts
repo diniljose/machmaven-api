@@ -25,21 +25,26 @@ const allowedHeaders = [
   'Content-Type',
 ];
 
-// export async function setupCors(app: NestFastifyApplication) {
-//   await app.register(fastifyCors, {
-//     origin: (origin, callback) => {
-//       if (origin === undefined || whitelist.has(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error('Not allowed by CORS'), false);
-//       }
-//     },
-//     allowedHeaders: allowedHeaders,
-//     methods: ['GET', 'PATCH', 'POST', 'DELETE'],
-//     exposedHeaders: 'cookies',
-//     credentials: true,
-//   });
-// }
+export async function setupCors(app: NestFastifyApplication) {
+
+await app.register(fastifyCors, {
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+});
+  // await app.register(fastifyCors, {
+  //   origin: (origin, callback) => {
+  //     if (origin === undefined || whitelist.has(origin)) {
+  //       callback(null, true);
+  //     } else {
+  //       callback(new Error('Not allowed by CORS'), false);
+  //     }
+  //   },
+  //   allowedHeaders: allowedHeaders,
+  //   methods: ['GET', 'PATCH', 'POST', 'DELETE'],
+  //   exposedHeaders: 'cookies',
+  //   credentials: true,
+  // });
+}
 
 
 export async function setupHelmets(app: NestFastifyApplication) {
